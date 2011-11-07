@@ -2,7 +2,7 @@ module Achievements
   
   def self.included(base)
     base.class_eval do
-      has_many :achievements, :as => :achievable do
+      has_many :achievements do
         def include?(achievement, level = nil)
           all.select { |a| a.type.to_s == achievement.to_s and a.level == level }.any?
         end
@@ -11,11 +11,11 @@ module Achievements
   end
 
   def award_achievement(achievement, level = nil, ref = nil)
-    achievement.create!(:achievable => self, :level => level, :ref => ref)
+    achievement.create!(:user => self, :level => level)
   end
   
   def has_achievement?(achievement, level = nil)
-    conditions = {:type => achievement.to_s, :achievable_id => id, :achievable_type => self.class.to_s}    
+    conditions = {:type => achievement.to_s, :user_id => id}    
     conditions[:level] = level if level
     achievements.first(:conditions => conditions).present?
   end
